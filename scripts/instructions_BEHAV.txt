@@ -1,0 +1,20 @@
+Thank you for participating in our experiment!\n\nPress right arrow to continue.
+In this experiment, you will hear a series of sentences.\n\nPress right arrow to continue.
+Press the right arrow to listen to a sentence:
+Press right arrow to continue.
+Sometimes the sentence will be spoken in a quiet environment,\nand other times it will be spoken in a loud environment.\nPress right arrow to listen:
+Press right arrow to continue.
+Listen carefully to each sentence and pay\nattention to *who* is performing the action.\n\nEven though it may be difficult to understand,\ndo NOT adjust the volume of your headphones!
+Uncles that forgive aunts are lenient.\n\nWho is performing the action?
+In this case, the UNCLES are doing the forgiving.
+Aunts that forgive uncles are lenient.\n\nWho is performing the action?
+In this case, the AUNTS are doing the forgiving.
+For each sentence, you need to identify the\n*gender* of the person performing the action.
+Kings that queens protect are noble.\n\nWhat is the gender of the person performing\nthe action?
+Since QUEENS are doing the protecting, the\nanswer is FEMALE.
+Queens that kings protect are noble.\n\nWhat is the gender of the person performing\nthe action?
+Since KINGS are doing the protecting, the\nanswer is MALE.
+If the gender of the person performing the action is MALE,\npress the RIGHT arrow key.\n\nIf the gender of the person performing the action is FEMALE,\npress the LEFT arrow key.
+Let's do a practice block.\n\nDuring the practice, you will be told if you were right or wrong.\n\nYou will have 5 seconds to respond each trial.
+Great job! You answered %s out of 8 sentences\ncorrectly.\n\nExperimenter: press the left arrow\nkey to repeat the practice block.\nPress the right arrow key to start\nthe experiment.
+Now let's move onto the real experiment. You\nwill not be told if you are right or wrong\nafter each sentence.\nRemember to tap along with the metronome!\n\nGood luck!\nPress right arrow to start.
