@@ -32,6 +32,8 @@
 %   - No more SNR condition. Just Noise/OR/SR
 %   ~ 24 events: 10 OR, 10 SR, 4 Noise
 %   ~ Passive (post-run) task based on memory
+% 04/15/21 -- v2 features updates from CBH testing. Now developing for
+%   Linux laptop, thank goodness. 
 
 clearvars; sca; 
 DisableKeysForKbCheck([]); 
@@ -65,7 +67,6 @@ else
         'Subject number (Naming convention?):', ...
         'First run (1)', ... 
         'Last run (4)', ... 
-        'RTBox connected (0/1):', ...
         }; 
     dlg_ans = inputdlg(prompt); 
 end
@@ -73,13 +74,13 @@ end
 subj.Num  = dlg_ans{1};
 subj.firstRun = str2double(dlg_ans{2}); 
 subj.lastRun  = str2double(dlg_ans{3}); 
-ConnectedToRTBox = str2double(dlg_ans{4}); 
+ConnectedToRTBox = 0; % ALWAYS OFF
 
 %% Scan paradigm
 % Abbreviated Hybrid
 % Will test Optimized Hybrid as well
-p.TR     = 1.000; 
-p.epiNum = 8;  % testing hybrid_isss version!
+p.TR     = 0.500; 
+p.epiNum = 16;  % testing hybrid_isss version!
 
 % Timing
 p.runsMax = 4; % New design has more stimuli and longer runs
@@ -138,8 +139,8 @@ firstPulse = NaN(1, p.runsMax);
 runEnd     = NaN(1, p.runsMax); 
 
 %% File names
-results_xlsx = ['MLB_' subj.Num '_language_v1_hybrid.xlsx']; 
-results_mat  = ['MLB_' subj.Num '_language_v1_hybrid.mat']; 
+results_xlsx = ['MLB_' subj.Num '_language_v2.xlsx']; 
+results_mat  = ['MLB_' subj.Num '_language_v2.mat']; 
 
 %% Create keys
 % Each block consists of 24 sentences. There will be 12 OR and 12 SR
@@ -213,7 +214,9 @@ key_stimEnd    = key_stimStart  + dur_all;
 if DEBUG
     [wPtr, rect] = Screen('OpenWindow', 1, 185, [0 0 1280 720]);
 else
-    [wPtr, rect] = Screen('OpenWindow', 2, 185); % may need adjustment
+    [wPtr, rect] = Screen('OpenWindow', 3, 185); % may need adjustment
+    % 022521 -- set to display 3, and adjust Windows settings
+    %%% Will need updating on laptop
 end
 
 DrawFormattedText(wPtr, 'Please wait, preparing experiment...');
@@ -223,8 +226,12 @@ centerY = rect(4)/2;
 crossCoords = [-30, 30, 0, 0; 0, 0, -30, 30]; 
 HideCursor(); 
 
-pahandle = PsychPortAudio('Open', 5, [], [], fs); 
+pahandle = PsychPortAudio('Open', 1, [], [], fs); 
 % 5 in lab, 3 at home what is it at CBH? Check audio devices
+% 022521 -- CBH uses device 3 (Windows WASAPI) but plays at 48k
+% MAKE NEW STIMULI
+%%% Will need updating on laptop
+
 %%% PTB note:
 % MS-Windows you’ll have the choice between up to 5 different audio 
 % subsystems:
