@@ -42,6 +42,7 @@
 %   ~ active task: typical gender-based OR/SR task
 % 06/21/21 -- Merging with work from linux device. Let's just call this one
 %   v3. Starting rhythm task
+% 06/24/21 -- Picked final stimuli. Changed task. AGAIN. 
 
 clearvars; sca; 
 PsychDefaultSetup(2)
@@ -49,9 +50,9 @@ DisableKeysForKbCheck([]);
 try; KbQueueStop; end %#ok<TRYNC,NOSEM>
 clc; 
 
-%% Startup
+%% Startp
 DEBUG = 0; 
-whichScreen = 1;  % set to  0 at CBH?
+whichScreen = 1;  % set to 1 at CBH?
 whichAudio  = 4; 
 
 try 
@@ -74,7 +75,7 @@ end
 %% Parameters
 if DEBUG
     warning('USING DEBUG DEFAULTS!')
-    dlg_ans = {'TEST', '1', '1'}; 
+    dlg_ans = {'TEST', '1', '4'}; 
 else
     prompt = {...
         'Subject number:', ...
@@ -124,7 +125,7 @@ cd ..
 dir_exp = pwd; 
 
 dir_stim        = fullfile(dir_exp, 'stimuli');
-dir_stim_rhythm = fullfile(dir_stim, 'MLB_rhythm_temp'); 
+dir_stim_rhythm = fullfile(dir_stim, 'MLB_rhythm_48k_rms'); 
 dir_scripts     = fullfile(dir_exp, 'scripts');
 dir_results     = fullfile(dir_exp, 'results');
 
@@ -149,8 +150,8 @@ firstPulse = NaN(1, p.runsMax);
 runEnd     = NaN(1, p.runsMax); 
 
 %% File names
-results_xlsx = ['MLB_' subj.Num '_rhythm_temp_v3.xlsx']; 
-results_mat  = ['MLB_' subj.Num '_rhythm_temp_v3.mat']; 
+results_xlsx = ['MLB_' subj.Num '_rhythm_v3.xlsx']; 
+results_mat  = ['MLB_' subj.Num '_rhythm_v3.mat']; 
 
 %% Create keys
 % Each block consists of 16 sentences and 4 noise trials. 8 OR and 8 SR
@@ -167,16 +168,45 @@ results_mat  = ['MLB_' subj.Num '_rhythm_temp_v3.mat'];
 % event 998 is oddball (same) trial
 % event 999 is baseline (tone) trial
 key_events = nan(p.events, p.runsMax); 
-rhythms = reshape(1:p.sounds, [p.rhythms, p.runsMax]); 
+% rhythms = reshape(1:p.sounds, [p.rhythms, p.runsMax]); 
+%  1-16 is clarinet (skipping oddball and tone... they are loaded separate)
+% 17-32 is piano
+% 33-48 is trombone
+% 49-64 is vibraphone
+% Then, let's choose tone and oddball stimuli. 
+% 65 -- clarinet irregular oddball
+% 66 -- clarinet regular oddball
+% 67 -- clarinet constant tone
+% 68 -- piano irreg odd
+% 69 -- piano reg odd
+% 70 -- piano tone
+% 71 -- tbone ""
+% 72 -- "" ""
+% 73 -- "" ""
+% 74 -- vibraphone ""
+% 75 -- "" ""
+% 76 -- "" "" 
+%%% Probably easiest to manually "seed" and shuffle
+%%% Let's just go diagnonally. 
+rhythms = [1 2 19 20 37 38 55 56  9 10 27 28 45 46 63 64; ...
+           3 4 21 22 39 40 49 50 11 12 29 30 47 48 57 58; ...
+           5 6 23 24 33 34 51 52 13 14 31 32 41 42 59 60; ...
+           7 8 17 18 35 36 53 54 15 16 25 26 43 44 61 62; ...
+           ]'; 
+%%% We seed these too
+oddtones = [65 69 73 76; ... % clar irreg, piano reg, tbone tone, vibe tone
+            66 70 73 74; ... % clar reg, piano tone, tbone tone, vibe irreg
+            67 70 71 75; ... % clar tone, piano tone, tbone irreg, vibe reg 
+            67 68 72 76; ... % clar tone, piano irreg, tbone reg, vibe tone
+            ]';       
+%%% Shuffle which run and oddtones are presented
+runKey = Shuffle(1:4); 
+odtKey = Shuffle(1:4); 
 for rr = 1:p.runsMax
-    %%% TODO: ADD BALANCING OF # ONSETS
-    thisrun = rhythms(:, rr);
-    key_events(:, rr) = Shuffle([thisrun; repelem(998, p.oddball)'; ...
-                                          repelem(999, p.baseline)']); 
+    thisrun =  rhythms(:, runKey(rr));
+    thisodt = oddtones(:, odtKey(rr)); 
+    key_events(:, rr) = Shuffle([thisrun; thisodt]); 
 end
-
-% CHECK: There should be p.runsMax * p.rhythms + 1 unique items
-% assert(length(unique(key_events)) == p.runsMax * p.rhythms + 1)
 
 temp           = p.epiTime + [0:p.eventTime:((p.events-1)*p.eventTime)]'; %#ok<NBRAK>
 key_onset      = 0.5*ones(p.events, p.runsMax); % add slight delay
@@ -192,24 +222,20 @@ fs_events = zeros(p.events, p.runsMax);
 % We are loading audio data in the order of stimuli presentation!
 
 disp('loading all stimuli...')
-files = dir(fullfile(dir_stim_rhythm, '*.wav')); fname = {files.name}';
-files = fullfile(dir_stim_rhythm, fname)';
+files = dir(fullfile(dir_stim_rhythm, '*.wav')); 
+fname = {files.name}';
 
-tone_finder = find(contains(files, 'constant_tone')); 
-oddball_idx = find(contains(files, 'oddball'), 1); 
+%%% Separate oddballs and tones from rhythms
+these_oddtones = contains(fname, 'oddball') | contains(fname, 'tone'); 
+foddtones = fname(these_oddtones);
+frhythms = fname; frhythms(these_oddtones) = []; 
+fname_all = [frhythms; foddtones]; 
+fname_all_full = fullfile(dir_stim_rhythm, fname_all);
+
 for rr = 1:p.runsMax
     for ee = 1:p.events
-        if key_events(ee, rr) == 999 % if tone
-            key_stimuli{ee, rr} = fname{tone_finder}; 
-            thisfile = files{tone_finder};  
-        elseif key_events(ee, rr) == 998 % if oddball
-            key_stimuli{ee, rr} = fname{oddball_idx}; 
-            thisfile = files{oddball_idx}; 
-            oddball_idx = oddball_idx + 1; 
-        else
-            key_stimuli{ee, rr} = fname{key_events(ee, rr)}; 
-            thisfile = files{key_events(ee, rr)}; 
-        end
+        key_stimuli{ee, rr} = fname_all{key_events(ee, rr)}; 
+        thisfile = fname_all_full{key_events(ee, rr)}; 
         
         [tempAudio, fs_events(ee, rr)] = audioread(thisfile); 
         ad_events{ee, rr} = [tempAudio'; tempAudio']; 

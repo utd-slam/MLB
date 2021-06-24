@@ -51,7 +51,7 @@ clc;
 
 %% Startup
 DEBUG = 0; 
-whichScreen = 1;  % set to  0 at CBH?
+whichScreen = 1;  % set to 1 at CBH?
 whichAudio  = 4; 
 % what to use @ CBH??
 % also depends on OS: 0 for linux, 11 for Windows (lab)?
@@ -125,7 +125,7 @@ cd ..
 dir_exp = pwd; 
 
 dir_stim      = fullfile(dir_exp, 'stimuli');
-dir_stim_lang = fullfile(dir_stim, 'MLB_language'); 
+dir_stim_lang = fullfile(dir_stim, 'MLB_language_48k_rms'); 
 dir_scripts   = fullfile(dir_exp, 'scripts');
 dir_results   = fullfile(dir_exp, 'results');
 

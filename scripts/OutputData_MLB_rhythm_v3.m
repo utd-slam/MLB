@@ -73,13 +73,13 @@ for rr = subj.firstRun:subj.lastRun
     Rhythm = vertcat(Rhythm, key_stimuli(:, rr)); 
     
     complex = cell(p.events, 1); 
-    temp = cellfun((@(x) contains(x, 'i')), key_stimuli(:, rr)); % irregular/complex
+    temp = cellfun((@(x) contains(x, '_i')), key_stimuli(:, rr)); % irregular/complex
     complex(temp) = {'Complex'};
-    temp = cellfun((@(x) contains(x, 'r')), key_stimuli(:, rr)); % regular/simple
+    temp = cellfun((@(x) contains(x, '_r')), key_stimuli(:, rr)); % regular/simple
     complex(temp) = {'Simple'};
     temp = cellfun((@(x) contains(x, 'oddball')), key_stimuli(:, rr)); % oddball
     complex(temp) = {'Oddball'};
-    temp = cellfun((@(x) contains(x, 'constant')), key_stimuli(:, rr)); % tone
+    temp = cellfun((@(x) contains(x, 'tone')), key_stimuli(:, rr)); % tone
     complex(temp) = {'Tone'};
     Complexity = vertcat(Complexity, complex); 
     
